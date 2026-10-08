@@ -78,6 +78,7 @@ if Path(file_sop).is_file():
             
             scene = bpy.context.scene
             scene.frame_start = 0
+            scene.frame_current = 0
             scene.frame_end = for_frames - 1
             scene.render.fps = 1
             scene.render.fps_base = struct.unpack("<I", interval)[0] / 1000
