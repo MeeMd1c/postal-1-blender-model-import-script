@@ -33,28 +33,28 @@ def read_header(f):
         unkn = f.read(4)
         if unkn != b"\x00\x00\x00\x00":
             print("!!! unknown: ", unkn)
-        anim_unkn1 = f.read(4)
-        if anim_unkn1 != b"\x01\x00\x00\x00":
-            print("animation unknown: ", anim_unkn1)
-        anim_unkn2 = f.read(4)
-        if anim_unkn2 != b"\x01\x00\x00\x00":
-            print("animation unknown 2: ", anim_unkn2)
-        frames = f.read(4)
+        t_total = f.read(4)
+        if t_total != b"\x01\x00\x00\x00":
+            print("total time: ", t_total)
+        t_int = f.read(4)
+        if t_int != b"\x01\x00\x00\x00":
+            print("time interval: ", t_int)
+        frames = f.read(4) #NumItems
         for_frames = struct.unpack("<I", frames)[0]
         print("frames: ", struct.unpack("<I", frames)[0])
         vertcount = f.read(4)
-        return frames, vertcount, for_frames
+        return frames, vertcount, for_frames, t_int
 
 if Path(file_sop).is_file():
     with open(file_sop, 'rb') as sop:
         print("Opening .sop")
-        frames, vertcount, for_frames = read_header(sop)
+        frames, vertcount, for_frames, interval = read_header(sop)
         print("verts: ", struct.unpack("<I", vertcount)[0])
         #if vertcount == b"\xFF\xFF\xFF\xFF":
         if Path(file_mesh).is_file():
             with open(file_mesh, 'rb') as mesh:
                 print("Opening .mesh")
-                frames_mesh, vertcount_mesh, for_frames_mesh = read_header(mesh)
+                frames_mesh, vertcount_mesh, for_frames_mesh, interval = read_header(mesh)
                 if vertcount_mesh != b"\xFF\xFF\xFF\xFF":
                     print("weird vertcount ", vertcount_mesh)
                 tricount = mesh.read(2)
@@ -79,7 +79,8 @@ if Path(file_sop).is_file():
             scene = bpy.context.scene
             scene.frame_start = 0
             scene.frame_end = for_frames - 1
-            scene.render.fps = 10
+            scene.render.fps = 1
+            scene.render.fps_base = struct.unpack("<I", interval)[0] / 1000
             
             for i in range(for_frames):
                 vertcount = sop.read(4)

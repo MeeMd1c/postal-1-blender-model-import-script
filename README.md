@@ -3,6 +3,7 @@ Blender import script for Postal 1 (RSPiX) models
 
 Features:
 - Loads Sea of Points (.sop) with mesh (.mesh) files
+- Loads time intervals (framerate)
 - Loads bounding spheres (.bounds)
 - Loads both static and animated models, animations are handled with shape keys
 
