@@ -29,29 +29,31 @@ def read_header(f):
         unkn = f.read(4)
         if unkn != b"\x00\x00\x00\x00":
             print("!!! unknown: ", unkn)
-        anim_unkn1 = f.read(4)
-        if anim_unkn1 != b"\x01\x00\x00\x00":
-            print("animation unknown: ", anim_unkn1)
-        anim_unkn2 = f.read(4)
-        if anim_unkn2 != b"\x01\x00\x00\x00":
-            print("animation unknown 2: ", anim_unkn2)
-        frames = f.read(4)
+        t_total = f.read(4)
+        if t_total != b"\x01\x00\x00\x00":
+            print("total time: ", t_total)
+        t_int = f.read(4)
+        if t_int != b"\x01\x00\x00\x00":
+            print("time interval: ", t_int)
+        frames = f.read(4) #NumItems
         for_frames = struct.unpack("<I", frames)[0]
         print("frames: ", struct.unpack("<I", frames)[0])
         vertcount = f.read(4)
-        return frames, for_frames
+        return frames, for_frames, t_int
 
 if Path(file_bounds).is_file():
     with open(file_bounds, 'rb') as bounds:
         print("Opening .bounds")
-        frames, for_frames = read_header(bounds)
+        frames, for_frames, interval = read_header(bounds)
 
         bounds.seek(-4, 1)
             
         scene = bpy.context.scene
         scene.frame_start = 0
+        scene.frame_current = 0
         scene.frame_end = for_frames - 1
-        scene.render.fps = 10
+        scene.render.fps = 1
+        scene.render.fps_base = struct.unpack("<I", interval)[0] / 1000
 
         empty_data = bpy.data.objects.new(file_name+"_bounds", None)
 
@@ -72,9 +74,13 @@ if Path(file_bounds).is_file():
             z = bounds.read(4)
             scale = bounds.read(4)
 
-            x_val = struct.unpack("<f", x)[0]
-            y_val = struct.unpack("<f", y)[0]
-            z_val = struct.unpack("<f", z)[0]
+            x_val = struct.unpack("<f", z)[0] * -1
+            y_val = struct.unpack("<f", x)[0] * -1
+            z_val = struct.unpack("<f", y)[0]
+            
+            #x_val = struct.unpack("<f", x)[0]
+            #y_val = struct.unpack("<f", z)[0]
+            #z_val = struct.unpack("<f", y)[0]
             scale_val = struct.unpack("<f", z)[0]
 
             empty_data.location = (x_val, y_val, z_val)
