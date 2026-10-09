@@ -10,5 +10,5 @@ Features:
 TODO:
 - add loading palette based texture (.tex)
 - add loading rigid transforms (.trans)
-- add support for legacy models (models that lack a version short, like "simple")
 - add exporting
+- add support for legacy models (models that lack a version short)
