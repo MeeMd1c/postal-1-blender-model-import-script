@@ -81,11 +81,12 @@ if Path(file_bounds).is_file():
             #x_val = struct.unpack("<f", x)[0]
             #y_val = struct.unpack("<f", z)[0]
             #z_val = struct.unpack("<f", y)[0]
-            scale_val = struct.unpack("<f", z)[0]
+            scale_val = struct.unpack("<f", scale)[0]
 
             empty_data.location = (x_val, y_val, z_val)
             empty_data.empty_display_size = scale_val
             obj.keyframe_insert(data_path="location")
-            obj.keyframe_insert(data_path="scale")
+            #obj.keyframe_insert(data_path="scale")
+            obj.keyframe_insert(data_path="empty_display_size")
             scene.frame_current += 1
         
